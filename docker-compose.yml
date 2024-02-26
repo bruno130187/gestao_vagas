@@ -1,0 +1,60 @@
+version: "3"
+name: "gestao-vagas"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "gestao_vagas"
+    ports:
+      - "5432:5432"
+    networks:
+      - compose-network
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "bruno@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "PgAdmin2019!"
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres
+    networks:
+      - compose-network
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - "./config/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - prometheus_data:/prometheus
+    ports:
+      - "7070:9090"
+    networks:
+      - compose-network
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - compose-network
+
+
+networks:
+  compose-network:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:
